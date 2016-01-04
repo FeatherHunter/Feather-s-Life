@@ -9,8 +9,15 @@
 #define COMMAND_CONTRL 2
 #define COMMAND_RESULT 3
 #define MAN_LOGIN 11
-#define RES_LOGIN 31
+#define CTL_LAMP  21
+#define CTL_GET        22
+#define RES_LOGIN      31
+#define RES_LAMP       32
+#define RES_TEMP       33
+#define RES_HUMI       34
 
+#define LAMP_ON        1
+#define LAMP_OFF       2
 #define LOGIN_SUCCESS 1
 #define LOGIN_FAILED  2
 

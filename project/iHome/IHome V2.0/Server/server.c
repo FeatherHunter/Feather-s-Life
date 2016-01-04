@@ -104,7 +104,13 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         if(rev_msg[i + 1] == COMMAND_SEPERATOR)
         {
             type = rev_msg[i];
-            printf("type:%d\n", type);
+            switch(type)
+            {
+                case COMMAND_MANAGE: printf("COMMAND_MANAGE\n");break;
+                case COMMAND_CONTRL: printf("COMMAND_CONTRL\n");break;
+                case COMMAND_RESULT: printf("COMMAND_RESULT\n");break;
+                default: printf("unknown type:%d\n", type);
+            }
             i+=2;
             /*ÎªÐÄÌø*/
             if(type == COMMAND_PULSE)
@@ -146,7 +152,17 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         if(rev_msg[i + 1] == COMMAND_SEPERATOR)
         {
             subtype = rev_msg[i];
-            printf("subtype:%d\n", subtype);
+            switch(subtype)
+            {
+                case MAN_LOGIN: printf("MAN_LOGIN\n");break;
+                case CTL_LAMP: printf("CTL_LAMP\n");break;
+                case CTL_GET: printf("CTL_GET\n");break;
+                case RES_LOGIN: printf("RES_LOGIN\n");break;
+                case RES_LAMP: printf("RES_LAMP\n");break;
+                case RES_TEMP: printf("RES_TEMP\n");break;
+                case RES_HUMI: printf("RES_HUMI\n");break;
+                default: printf("unknown subtype:%d\n", type);
+            }
             i+=2;
         }
         else
@@ -196,6 +212,7 @@ void service(char * rev_msg, int fd, int * userhome_flag)
                     }
                     i++;
                     tempbuf[j] = '\0';
+                    /*home fd*/
                     res = write(home_fd, tempbuf, strlen(tempbuf));
                     if(res <= 0)
                     {
@@ -207,6 +224,7 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         }
         else if(type == COMMAND_RESULT)
         {
+            printf("----------------send to user-------------------");
             /*it's home*/
             if(account[j-1]='h')
             {
@@ -225,7 +243,8 @@ void service(char * rev_msg, int fd, int * userhome_flag)
                     }
                     i++;
                     tempbuf[j] = '\0';
-                    res = write(home_fd, tempbuf, strlen(tempbuf));
+                    /*user fd*/
+                    res = write(user_fd, tempbuf, strlen(tempbuf));
                     if(res <= 0)
                     {
                         fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
