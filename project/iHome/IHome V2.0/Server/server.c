@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include "socket_server.h"
 #include "server.h"
-
+#include "idebug.h"
 int user_fd = -1;
 int home_fd = -1;
 
@@ -51,13 +51,24 @@ void * user_handler(void * arg)
     char buff[MESIZE];
     int fd = *((int *)arg);
     int rn;
+    int i;
     int userhome_flag = -1; //0为终端,1为客户
 
     while(1)
     {
         memset(buff, 0, sizeof(buff));
         rn = read(fd, buff, MESIZE);
-        printf("%s\n", buff);
+#if _DEBUG
+        printf("\n---------- rev msg --------------\n");
+        for(i = 0; i < rn; i++)
+        {
+            if((buff[i] >= '0' && buff[i] <= '9')||(buff[i] >= 'a' && buff[i] <= 'z') )
+                DEBUG("%c ", buff[i]);
+            else
+                DEBUG("%d ", buff[i]);
+        }
+        printf("\n----------------------------------\n");
+#endif // DEBUG
         if(rn <= 0)
         {
             printf("%d offline\n", userhome_flag);
@@ -104,14 +115,16 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         if(rev_msg[i + 1] == COMMAND_SEPERATOR)
         {
             type = rev_msg[i];
+            i+=2;
+#if _DEBUG
             switch(type)
             {
-                case COMMAND_MANAGE: printf("COMMAND_MANAGE\n");break;
-                case COMMAND_CONTRL: printf("COMMAND_CONTRL\n");break;
-                case COMMAND_RESULT: printf("COMMAND_RESULT\n");break;
+                case COMMAND_MANAGE: printf("manage\n");break;
+                case COMMAND_CONTRL: printf("contrl\n");break;
+                case COMMAND_RESULT: printf("result\n");break;
                 default: printf("unknown type:%d\n", type);
             }
-            i+=2;
+#endif
             /*为心跳*/
             if(type == COMMAND_PULSE)
             {
@@ -145,25 +158,27 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         {
             account[j] = rev_msg[i];
         }
-        printf("account:%s\n", account);
+        DEBUG("account:%s\n", account);
         i++;
         account[j] = '\0';
         /*get type*/
         if(rev_msg[i + 1] == COMMAND_SEPERATOR)
         {
             subtype = rev_msg[i];
+            i+=2;
+#if _DEBUG
             switch(subtype)
             {
-                case MAN_LOGIN: printf("MAN_LOGIN\n");break;
-                case CTL_LAMP: printf("CTL_LAMP\n");break;
-                case CTL_GET: printf("CTL_GET\n");break;
-                case RES_LOGIN: printf("RES_LOGIN\n");break;
-                case RES_LAMP: printf("RES_LAMP\n");break;
-                case RES_TEMP: printf("RES_TEMP\n");break;
-                case RES_HUMI: printf("RES_HUMI\n");break;
+                case MAN_LOGIN: printf("MAN_login\n");break;
+                case CTL_LAMP: printf("CTL_lamp\n");break;
+                case CTL_GET: printf("CTL_get\n");break;
+                case RES_LOGIN: printf("RES_login\n");break;
+                case RES_LAMP: printf("RES_lamp\n");break;
+                case RES_TEMP: printf("RES_temp\n");break;
+                case RES_HUMI: printf("RES_humi\n");break;
                 default: printf("unknown subtype:%d\n", type);
             }
-            i+=2;
+#endif
         }
         else
         {
@@ -177,10 +192,10 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         }
         if(type == COMMAND_MANAGE)
         {
-            printf("COMMAND_MANAGE\n");
+            DEBUG("arrive COMMAND_manage\n");
             if(subtype == MAN_LOGIN)
             {
-                printf("MAN_LOGIN\n");
+                DEBUG("arrive MAN_login\n");
                 /*get password*/
                 for(j = 0; (rev_msg[i] != COMMAND_SEPERATOR) && (rev_msg[i] != '\0') && j <= ACCOUNT_MAX; i++, j++)
                 {
@@ -194,12 +209,13 @@ void service(char * rev_msg, int fd, int * userhome_flag)
         }
         else if(type == COMMAND_CONTRL)
         {
+            DEBUG("arrive COMMAND_contrl\n");
             /*it's user*/
             if(account[j-1] != 'h')
             {
                 if(home_fd < 0)
                 {
-                    printf("not found home!\n");
+                    DEBUG("not found home!\n");
                 }
                 else
                 {
@@ -219,12 +235,13 @@ void service(char * rev_msg, int fd, int * userhome_flag)
                         fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
                         exit(EXIT_FAILURE);
                     }
+                    DEBUG("has sent to home\n");
                 }
             }//end of account
         }
         else if(type == COMMAND_RESULT)
         {
-            printf("----------------send to user-------------------");
+            DEBUG("arrive COMMAND_result\n");
             /*it's home*/
             if(account[j-1]='h')
             {
@@ -250,6 +267,7 @@ void service(char * rev_msg, int fd, int * userhome_flag)
                         fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
                         exit(EXIT_FAILURE);
                     }
+                    DEBUG("has sent to user\n");
                 }
             }
 
@@ -261,7 +279,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
 {
     int res;
     char tempbuf[MESIZE];
-    printf("AUTHENTICATION account:%s pssword:%s\n",account, password);
+    DEBUG("achive AUTHENTICATION account:%s pssword:%s\n",account, password);
     if(strcmp(account, "975559549") == 0)
     {
 
@@ -278,7 +296,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
                 fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
                 exit(EXIT_FAILURE);
             }
-            printf("975559549 user login success!\n");
+            DEBUG("975559549 user login success!\n");
         }
         else
         {
@@ -289,7 +307,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
                 fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
                 exit(EXIT_FAILURE);
             }
-            printf("975559549 user login falied!\n");
+            DEBUG("975559549 user login falied!\n");
         }
     }
     else if(strcmp(account, "975559549h") == 0)
@@ -308,7 +326,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
                 fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
                 exit(EXIT_FAILURE);
             }
-            printf("975559549 home login success!\n");
+            DEBUG("975559549 home login success!\n");
 
         }
         else//验证失败
@@ -320,7 +338,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
               fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
               exit(EXIT_FAILURE);
            }
-           printf("975559549 home login failed!\n");
+           DEBUG("975559549 home login failed!\n");
         }
     }
     else
@@ -332,7 +350,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
             fprintf(stderr, "write result error! %s %d", __FILE__, __LINE__);
             exit(EXIT_FAILURE);
         }
-        printf("%s login falied!\n", account);
+        DEBUG("%s login falied!\n", account);
 
     }
 }
