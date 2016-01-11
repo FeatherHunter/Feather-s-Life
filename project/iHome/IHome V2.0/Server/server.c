@@ -287,7 +287,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
         {
             user_fd = fd; //记录用户fd
             *userhome_flag = 1;
-            sprintf(tempbuf, "%c%c975559549%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
+            sprintf(tempbuf, "%c%cSERVER%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
                     RES_LOGIN,COMMAND_SEPERATOR,
                     LOGIN_SUCCESS,COMMAND_SEPERATOR, COMMAND_END);
             res = write(fd, tempbuf, strlen(tempbuf));
@@ -300,7 +300,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
         }
         else
         {
-            sprintf(tempbuf, "%c%c975559549%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
+            sprintf(tempbuf, "%c%cSERVER%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
             res = write(fd, tempbuf, strlen(tempbuf));
             if(res <= 0)
             {
@@ -317,7 +317,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
         {
             home_fd = fd; //记录家庭fd
             *userhome_flag = 0;
-            sprintf(tempbuf, "%c%c975559549h%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
+            sprintf(tempbuf, "%c%cSERVER%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
                     RES_LOGIN,COMMAND_SEPERATOR,
                     LOGIN_SUCCESS,COMMAND_SEPERATOR, COMMAND_END);
             res = write(fd, tempbuf, strlen(tempbuf));
@@ -331,7 +331,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
         }
         else//验证失败
        {
-           sprintf(tempbuf, "%c%c975559549%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
+           sprintf(tempbuf, "%c%cSERVER%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
            res = write(fd, tempbuf, strlen(tempbuf));
            if(res <= 0)
            {
@@ -343,7 +343,7 @@ void authentication(char * account, char * password, int fd, int * userhome_flag
     }
     else
     {
-        sprintf(tempbuf, "%c%c975559549%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
+        sprintf(tempbuf, "%c%cSERVER%c%c%c%c%c%c",COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,RES_LOGIN,COMMAND_SEPERATOR, LOGIN_FAILED,COMMAND_SEPERATOR, COMMAND_END);
         res = write(fd, tempbuf, strlen(tempbuf));
         if(res <= 0)
         {
